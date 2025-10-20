@@ -6,7 +6,8 @@ import java.util.regex.Pattern;
 public class SeperatorExtraction {
     private static final String DEFAULT_SEPARATOR = "[,:]";
     private static final String CUSTOM_SEPARATOR_PREFIX = "//";
-    private static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile("^//(.)\\n(.*)");
+    // ⭐ 백슬래시 + n 도 처리하도록 수정
+    private static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile("^//(.)(\\\\n|\\n)(.*)");
 
     public String extractSeparator(String input) {
         if (!input.startsWith(CUSTOM_SEPARATOR_PREFIX)) {
@@ -15,10 +16,11 @@ public class SeperatorExtraction {
 
         Matcher matcher = CUSTOM_SEPARATOR_PATTERN.matcher(input);
         if (matcher.find()) {
-            return Pattern.quote(matcher.group(1));
+            String customSep = matcher.group(1);
+            return Pattern.quote(customSep);
         }
 
-        return DEFAULT_SEPARATOR;
+        throw new IllegalArgumentException("잘못된 커스텀 구분자 형식입니다.");
     }
 
     public String extractNumberString(String input) {
@@ -28,9 +30,9 @@ public class SeperatorExtraction {
 
         Matcher matcher = CUSTOM_SEPARATOR_PATTERN.matcher(input);
         if (matcher.find()) {
-            return matcher.group(2);
+            return matcher.group(3);
         }
 
-        return input;
+        throw new IllegalArgumentException("잘못된 커스텀 구분자 형식입니다.");
     }
 }
